@@ -1,7 +1,7 @@
 streamlit
 streamlit-webrtc
 opencv-python
-mediapipe==0.10.14
+mediapipe
 numpy
 scikit-learn
 joblib

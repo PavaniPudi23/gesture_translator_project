@@ -2,7 +2,6 @@ import time
 from collections import deque
 
 import av
-import mediapipe as mp
 import streamlit as st
 from streamlit_webrtc import (
     RTCConfiguration,
@@ -12,7 +11,7 @@ from streamlit_webrtc import (
 )
 
 from utils.inference import GestureDetector
-from utils.preprocessing import process_frame
+from utils.preprocessing import process_frame, create_hand_detector
 from utils.speech import create_tts_audio_html
 from utils.translation import SUPPORTED_LANGUAGES, translate_text
 from utils.ui import display_result_box, inject_custom_css, render_header
@@ -58,10 +57,6 @@ if "last_spoken_text" not in st.session_state:
     st.session_state.last_spoken_text = ""
 
 
-# ---------------- MEDIAPIPE HANDS ----------------
-mp_hands = mp.solutions.hands
-
-
 # ---------------- VIDEO PROCESSOR ----------------
 class GestureProcessor(VideoProcessorBase):
     def __init__(self):
@@ -71,13 +66,8 @@ class GestureProcessor(VideoProcessorBase):
         self.latest_translation = ""
         self.latest_confidence = 0.0
 
-        # Use MediaPipe Hands (matches trained .pkl models)
-        self.hands = mp_hands.Hands(
-            static_image_mode=False,
-            max_num_hands=1,
-            min_detection_confidence=0.4,
-            min_tracking_confidence=0.4,
-        )
+        # Create hand detector (works with both old and new MediaPipe)
+        self.hands = create_hand_detector()
 
     def recv(self, frame):
         try:
