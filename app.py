@@ -96,36 +96,30 @@ class GestureProcessor(VideoProcessorBase):
 
 
 # ---------------- WEBRTC CONFIG ----------------
-# Use Metered TURN servers for reliable cloud deployment.
-# Free credentials from https://www.metered.ca/stun-turn (or set your own in st.secrets).
+# Fetch free TURN server credentials from Metered.ca API.
+# Set METERED_API_KEY in Streamlit secrets (free at https://www.metered.ca/signup).
+@st.cache_data(ttl=3600)
+def _fetch_metered_credentials(api_key):
+    """Fetch temporary TURN credentials from Metered.ca free API."""
+    import urllib.request
+    import json
+    url = f"https://gesture.metered.live/api/v1/turn/credentials?apiKey={api_key}"
+    with urllib.request.urlopen(url, timeout=5) as resp:
+        return json.loads(resp.read().decode())
+
+
 def _get_ice_servers():
     try:
-        # If Twilio or custom credentials are in secrets, use those
-        if hasattr(st, "secrets") and "TURN_USERNAME" in st.secrets:
-            return [
-                {"urls": ["stun:stun.l.google.com:19302"]},
-                {
-                    "urls": st.secrets["TURN_URLS"],
-                    "username": st.secrets["TURN_USERNAME"],
-                    "credential": st.secrets["TURN_CREDENTIAL"],
-                },
-            ]
+        if hasattr(st, "secrets") and "METERED_API_KEY" in st.secrets:
+            servers = _fetch_metered_credentials(st.secrets["METERED_API_KEY"])
+            return servers
     except Exception:
         pass
 
-    # Fallback: free OpenRelay TURN servers for reliable cloud connectivity
+    # Fallback: STUN only (may not work behind symmetric NAT)
     return [
         {"urls": ["stun:stun.l.google.com:19302"]},
-        {
-            "urls": [
-                "turn:openrelay.metered.ca:80",
-                "turn:openrelay.metered.ca:80?transport=tcp",
-                "turn:openrelay.metered.ca:443",
-                "turns:openrelay.metered.ca:443?transport=tcp",
-            ],
-            "username": "openrelayproject",
-            "credential": "openrelayproject",
-        },
+        {"urls": ["stun:stun1.l.google.com:19302"]},
     ]
 
 
