@@ -96,9 +96,34 @@ class GestureProcessor(VideoProcessorBase):
 
 
 # ---------------- WEBRTC CONFIG ----------------
-RTC_CONFIGURATION = RTCConfiguration(
-    {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
-)
+# Use Metered TURN servers for reliable cloud deployment.
+# Free credentials from https://www.metered.ca/stun-turn (or set your own in st.secrets).
+def _get_ice_servers():
+    try:
+        # If Twilio or custom credentials are in secrets, use those
+        if hasattr(st, "secrets") and "TURN_USERNAME" in st.secrets:
+            return [
+                {"urls": ["stun:stun.l.google.com:19302"]},
+                {
+                    "urls": st.secrets["TURN_URLS"],
+                    "username": st.secrets["TURN_USERNAME"],
+                    "credential": st.secrets["TURN_CREDENTIAL"],
+                },
+            ]
+    except Exception:
+        pass
+
+    # Fallback: public STUN servers (works on most networks)
+    return [
+        {"urls": ["stun:stun.l.google.com:19302"]},
+        {"urls": ["stun:stun1.l.google.com:19302"]},
+        {"urls": ["stun:stun2.l.google.com:19302"]},
+        {"urls": ["stun:stun3.l.google.com:19302"]},
+        {"urls": ["stun:stun4.l.google.com:19302"]},
+    ]
+
+
+RTC_CONFIGURATION = RTCConfiguration({"iceServers": _get_ice_servers()})
 
 
 # ---------------- UI LAYOUT ----------------
