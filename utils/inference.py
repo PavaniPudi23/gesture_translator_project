@@ -4,6 +4,9 @@ import joblib
 
 from utils.constants import SEQUENCE_LENGTH, CONFIDENCE_THRESHOLD, FEATURES_PER_FRAME
 
+# Resolve project root from this file's location (utils/ -> project root)
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 
 class GestureDetector:
     """Loads a scikit-learn .pkl model and its LabelEncoder for prediction."""
@@ -22,8 +25,8 @@ class GestureDetector:
             model_file = "word_model.pkl"
             encoder_file = "word_label_encoder.pkl"
 
-        model_path = os.path.join("models", model_file)
-        encoder_path = os.path.join("models", encoder_file)
+        model_path = os.path.join(_PROJECT_ROOT, "models", model_file)
+        encoder_path = os.path.join(_PROJECT_ROOT, "models", encoder_file)
 
         try:
             if os.path.exists(model_path) and os.path.exists(encoder_path):
