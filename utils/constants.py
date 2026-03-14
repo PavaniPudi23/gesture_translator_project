@@ -1,0 +1,10 @@
+# Sequence length must match training (create_dataset.py uses 20)
+SEQUENCE_LENGTH = 20
+
+CONFIDENCE_THRESHOLD = 0.7
+MAX_SENTENCE_LENGTH = 5
+
+# Hand landmark dimensions
+NUM_HAND_LANDMARKS = 21
+LANDMARK_DIMS = 3
+FEATURES_PER_FRAME = NUM_HAND_LANDMARKS * LANDMARK_DIMS  # 63

@@ -1,0 +1,28 @@
+# Virtual environment
+venv/
+venv_new/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Training data and outputs
+dataset/
+outputs/
+assets/
+
+# Training scripts (not needed for deployment)
+src/
+
+# Alphabet model (too large for GitHub, not used by app.py)
+models/alphabet_image_model.pkl
+models/alphabet_image_label_encoder.pkl
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
